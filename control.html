@@ -122,12 +122,33 @@
           </div>
         </div>
         
-        <div class="controls mt-4 text-center">
-          <button class="btn btn-lamp me-3" id="toggle-lamp"><i class="bi bi-lightbulb"></i> Luz UV</button>
-          <button class="btn btn-hum" id="toggle-hum"><i class="bi bi-droplet"></i> Humidificador</button>
-        </div>
+<div class="controls mt-4 text-center">
+  <button class="btn btn-lamp me-3" id="toggle-lamp"><i class="bi bi-lightbulb"></i> Luz UV</button>
+  <button class="btn btn-hum" id="toggle-hum"><i class="bi bi-droplet"></i> Humidificador</button>
+</div>
+
+<!-- Agregar esta sección para lecturas manuales -->
+<div class="card terrario-card mt-4">
+  <div class="card-header bg-transparent">
+    <h5 class="mb-0"><i class="bi bi-pencil-square"></i> Lectura Manual</h5>
+  </div>
+  <div class="card-body">
+    <div class="row g-3">
+      <div class="col-md-5">
+        <label for="manual-temp" class="form-label">Temperatura (°C)</label>
+        <input type="number" step="0.1" min="0" max="50" class="form-control" id="manual-temp" placeholder="Ej: 25.5">
+      </div>
+      <div class="col-md-5">
+        <label for="manual-hum" class="form-label">Humedad (%)</label>
+        <input type="number" step="0.1" min="0" max="100" class="form-control" id="manual-hum" placeholder="Ej: 65.0">
+      </div>
+      <div class="col-md-2 d-flex align-items-end">
+        <button class="btn btn-success w-100" id="add-reading-btn">
+          <i class="bi bi-plus-circle"></i> Agregar
+        </button>
       </div>
     </div>
+    <small class="text-muted">Los valores se sincronizarán con el servidor y se reflejarán en todas las vistas</small>
   </div>
 </div>
 

@@ -56,32 +56,30 @@ function buildAlerts(temp, hum) {
 }
 
 // Generar datos de sensor 
+// Generar datos de sensor aleatorios para simulación
 function generateSensorData() {
-  try {
-    // Intentar leer el último sensorData guardado en localStorage (o MockAPI si lo usas allí)
-    const last = JSON.parse(localStorage.getItem("last_sensor_data") || "null");
-    if (last) {
-      return {
-        temperatura: last.temperatura,
-        humedad: last.humedad,
-        activo: last.activo ?? true,
-        fecha: new Date().toISOString()
-      };
-    }
-  } catch(e) {
-    console.warn("No se pudo leer último sensorData:", e);
+  // Si ya hay datos del sensor, usar como base con pequeña variación
+  if (currentState && currentState.sensor && currentState.sensor.temperatura !== "0.0") {
+    let temp = parseFloat(currentState.sensor.temperatura);
+    let hum = parseFloat(currentState.sensor.humedad);
+    
+    // Pequeña variación aleatoria
+    const tempVariation = (Math.random() - 0.5) * 2.0;
+    const humVariation = (Math.random() - 0.5) * 5.0;
+    
+    return {
+      temperatura: Math.max(15, Math.min(35, temp + tempVariation)).toFixed(1),
+      humedad: Math.max(30, Math.min(80, hum + humVariation)).toFixed(1),
+      activo: true,
+      fecha: new Date().toISOString()
+    };
   }
-
-  // Si no había nada guardado → simular aleatorio inicial
-  const data = {
-    temperatura: (Math.random() * 10 + 20).toFixed(1), // 20–30°C
-    humedad: (Math.random() * 30 + 40).toFixed(1),     // 40–70%
+  
+  // Si no hay datos previos, generar valores aleatorios base
+  return {
+    temperatura: (Math.random() * 10 + 20).toFixed(1), // 20-30°C
+    humedad: (Math.random() * 30 + 40).toFixed(1), // 40-70%
     activo: true,
     fecha: new Date().toISOString()
   };
-
-  // Guardar como base para la siguiente llamada
-  localStorage.setItem("last_sensor_data", JSON.stringify(data));
-
-  return data;
 }

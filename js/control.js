@@ -1,4 +1,4 @@
-// js/control.js - Corregido sin redeclaración de STANDARDS
+// js/control.js - Corregido con control manual y simulación automática
 let currentTerrarioId = null;
 let currentTerrario = null;
 let currentState = { 
@@ -74,17 +74,8 @@ async function fetchStatus(){
     
     if (latestSensor) {
       currentState.sensor = latestSensor;
-    } else {
-      // Si no hay datos de sensor, generar unos aleatorios
-      try {
-        const newSensorData = generateSensorData();
-        await addSensorData(currentTerrarioId, newSensorData);
-        currentState.sensor = newSensorData;
-      } catch (error) {
-        console.error('Error al generar datos de sensor:', error);
-      }
     }
-
+    
     updateUI(currentState.humidifier, currentState.lamp, currentState.sensor);
     
     if (currentState.sensor) {
@@ -160,9 +151,19 @@ async function toggleDevice(dev, newState){
     if(dev === 'lamp'){
       await addLampData(currentTerrarioId, { encendido: newState });
       currentState.lamp.encendido = newState;
+      
+      // Efecto de la lámpara en la temperatura
+      if (newState) {
+        simulateLampEffect();
+      }
     } else if(dev === 'humidifier'){
       await addHumidifierData(currentTerrarioId, { encendido: newState });
       currentState.humidifier.encendido = newState;
+      
+      // Efecto del humidificador en la humedad
+      if (newState) {
+        simulateHumidifierEffect();
+      }
     }
 
     showAlert(`Dispositivo ${newState ? 'activado' : 'desactivado'}`,'success');
@@ -184,6 +185,185 @@ async function toggleDevice(dev, newState){
   }
 }
 
+// Simular efecto de la lámpara en la temperatura
+async function simulateLampEffect() {
+  if (!currentState.sensor || !currentTerrarioId) return;
+  
+  let currentTemp = parseFloat(currentState.sensor.temperatura);
+  if (isNaN(currentTemp)) currentTemp = 20; // Valor por defecto
+  
+  // Aumentar temperatura gradualmente (0.5°C cada 10 segundos)
+  const interval = setInterval(async () => {
+    if (!currentState.lamp.encendido) {
+      clearInterval(interval);
+      return;
+    }
+    
+    currentTemp += 0.5;
+    if (currentTemp > 35) currentTemp = 35; // Límite máximo
+    
+    try {
+      await addSensorData(currentTerrarioId, {
+        temperatura: currentTemp.toFixed(1),
+        humedad: currentState.sensor.humedad || "50.0",
+        activo: true
+      });
+      
+      // Actualizar estado local
+      currentState.sensor.temperatura = currentTemp.toFixed(1);
+      updateUI(currentState.humidifier, currentState.lamp, currentState.sensor);
+      
+    } catch (error) {
+      console.error('Error al simular efecto lámpara:', error);
+      clearInterval(interval);
+    }
+  }, 10000); // Cada 10 segundos
+}
+
+// Simular efecto del humidificador en la humedad
+async function simulateHumidifierEffect() {
+  if (!currentState.sensor || !currentTerrarioId) return;
+  
+  let currentHum = parseFloat(currentState.sensor.humedad);
+  if (isNaN(currentHum)) currentHum = 50; // Valor por defecto
+  
+  // Aumentar humedad gradualmente (2% cada 10 segundos)
+  const interval = setInterval(async () => {
+    if (!currentState.humidifier.encendido) {
+      clearInterval(interval);
+      return;
+    }
+    
+    currentHum += 2;
+    if (currentHum > 90) currentHum = 90; // Límite máximo
+    
+    try {
+      await addSensorData(currentTerrarioId, {
+        temperatura: currentState.sensor.temperatura || "25.0",
+        humedad: currentHum.toFixed(1),
+        activo: true
+      });
+      
+      // Actualizar estado local
+      currentState.sensor.humedad = currentHum.toFixed(1);
+      updateUI(currentState.humidifier, currentState.lamp, currentState.sensor);
+      
+    } catch (error) {
+      console.error('Error al simular efecto humidificador:', error);
+      clearInterval(interval);
+    }
+  }, 10000); // Cada 10 segundos
+}
+
+// Función para agregar lectura manual
+async function addManualReading() {
+  if (!currentTerrarioId) {
+    showAlert('Primero selecciona un terrario', 'warning');
+    return;
+  }
+  
+  const tempInput = document.getElementById('manual-temp');
+  const humInput = document.getElementById('manual-hum');
+  
+  const temperatura = parseFloat(tempInput.value);
+  const humedad = parseFloat(humInput.value);
+  
+  if (isNaN(temperatura) || isNaN(humedad)) {
+    showAlert('Por favor ingresa valores válidos para temperatura y humedad', 'danger');
+    return;
+  }
+  
+  if (temperatura < 0 || temperatura > 50) {
+    showAlert('La temperatura debe estar entre 0°C y 50°C', 'danger');
+    return;
+  }
+  
+  if (humedad < 0 || humedad > 100) {
+    showAlert('La humedad debe estar entre 0% y 100%', 'danger');
+    return;
+  }
+  
+  try {
+    await addSensorData(currentTerrarioId, {
+      temperatura: temperatura.toFixed(1),
+      humedad: humedad.toFixed(1),
+      activo: true
+    });
+    
+    // Actualizar estado local
+    currentState.sensor = {
+      temperatura: temperatura.toFixed(1),
+      humedad: humedad.toFixed(1),
+      activo: true,
+      fecha: new Date().toISOString()
+    };
+    
+    updateUI(currentState.humidifier, currentState.lamp, currentState.sensor);
+    checkStandards(temperatura, humedad);
+    
+    // Limpiar inputs
+    tempInput.value = '';
+    humInput.value = '';
+    
+    showAlert('Lectura manual agregada correctamente', 'success');
+    
+  } catch (error) {
+    console.error('Error al agregar lectura manual:', error);
+    showAlert('Error al agregar lectura manual', 'danger');
+  }
+}
+
+// Simulación automática de sensor cada minuto
+function startSensorSimulation() {
+  setInterval(async () => {
+    if (!currentTerrarioId || !currentState.sensor) return;
+    
+    try {
+      let currentTemp = parseFloat(currentState.sensor.temperatura);
+      let currentHum = parseFloat(currentState.sensor.humedad);
+      
+      if (isNaN(currentTemp)) currentTemp = 20;
+      if (isNaN(currentHum)) currentHum = 50;
+      
+      // Pequeña variación aleatoria (±0.5°C y ±2%)
+      const tempVariation = (Math.random() - 0.5) * 1.0;
+      const humVariation = (Math.random() - 0.5) * 4.0;
+      
+      let newTemp = currentTemp + tempVariation;
+      let newHum = currentHum + humVariation;
+      
+      // Ajustar por dispositivos encendidos
+      if (currentState.lamp.encendido) {
+        newTemp += 0.3; // Efecto adicional de lámpara
+      }
+      
+      if (currentState.humidifier.encendido) {
+        newHum += 1.5; // Efecto adicional de humidificador
+      }
+      
+      // Mantener dentro de rangos razonables
+      newTemp = Math.max(15, Math.min(40, newTemp));
+      newHum = Math.max(20, Math.min(90, newHum));
+      
+      await addSensorData(currentTerrarioId, {
+        temperatura: newTemp.toFixed(1),
+        humedad: newHum.toFixed(1),
+        activo: true
+      });
+      
+      // Actualizar estado local
+      currentState.sensor.temperatura = newTemp.toFixed(1);
+      currentState.sensor.humedad = newHum.toFixed(1);
+      
+      updateUI(currentState.humidifier, currentState.lamp, currentState.sensor);
+      checkStandards(newTemp, newHum);
+      
+    } catch (error) {
+      console.error('Error en simulación automática:', error);
+    }
+  }, 60000); // Cada 60 segundos
+}
+
 // Event listeners para botones
 document.getElementById('toggle-lamp').addEventListener('click', () => {
   toggleDevice('lamp', !currentState.lamp.encendido);
@@ -192,6 +372,9 @@ document.getElementById('toggle-lamp').addEventListener('click', () => {
 document.getElementById('toggle-hum').addEventListener('click', () => {
   toggleDevice('humidifier', !currentState.humidifier.encendido);
 });
+
+// Event listener para lectura manual
+document.getElementById('add-reading-btn').addEventListener('click', addManualReading);
 
 // Inicializar
 document.addEventListener('DOMContentLoaded', async () => {
@@ -213,20 +396,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Actualizar cada 2 segundos
     setInterval(fetchStatus, 2000);
     
-    // Simular datos de sensor cada 5 segundos
-    setInterval(async () => {
-      if (currentTerrarioId) {
-        try {
-          const newSensorData = generateSensorData();
-          await addSensorData(currentTerrarioId, newSensorData);
-          currentState.sensor = newSensorData;
-          updateUI(currentState.humidifier, currentState.lamp, currentState.sensor);
-          checkStandards(parseFloat(newSensorData.temperatura), parseFloat(newSensorData.humedad));
-        } catch (error) {
-          console.error('Error al generar datos de sensor:', error);
-        }
-      }
-    }, 5000);
+    // Iniciar simulación automática de sensor
+    startSensorSimulation();
+    
   } catch (error) {
     console.error('Error al cargar terrario:', error);
     showAlert('Error al cargar el terrario', 'danger');
