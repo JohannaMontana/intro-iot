@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Control de Terrario IoT</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&family=Montserrat:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/isometric.css">
+<link rel="icon" href="img/terrario.png" type="image/png">
+</head>
+<body>
+<!-- <nav class="navbar navbar-expand-lg navbar-dark bg-green">
+  <div class="container">
+    <a class="navbar-brand" href="index.html">
+      <i class="bi bi-tree-fill me-2"></i>Terrario IoT
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="index.html">Inicio</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="crud.html">Administración</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="control.html">Control</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="monitor.html">Monitoreo</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav> -->
+
+<div class="container my-5">
+  <div class="alert-box"></div>
+  
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="title-text">Control del Terrario</h1>
+      <p class="text-muted" id="terrario-name">Selecciona un terrario desde la página principal</p>
+    </div>
+    <a href="index.html" class="btn btn-terrario-outline">
+      <i class="bi bi-arrow-left"></i> Volver a Terrarios
+    </a>
+  </div>
+  
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card terrario-card p-4 mb-4">
+        <div class="rotation-controls mb-3 text-center">
+          <button class="btn btn-sm btn-terrario-outline me-2" id="rotate-left"><i class="bi bi-arrow-counterclockwise"></i> Rotar Izquierda</button>
+          <button class="btn btn-sm btn-terrario-outline" id="rotate-right">Rotar Derecha <i class="bi bi-arrow-clockwise"></i></button>
+        </div>
+        
+        <div class="terrario-container">
+          <div class="terrario" id="terrario">
+            <!-- SVG Terrario -->
+            <<svg id="terrario-svg" viewBox="0 0 400 300" width="100%" height="400">
+  <!-- Fondo con gradiente de terrario -->
+  <defs>
+    <linearGradient id="glassGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="rgba(173,216,230,0.1)" />
+      <stop offset="100%" stop-color="rgba(173,216,230,0.3)" />
+    </linearGradient>
+    <linearGradient id="baseGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#9c6d3e" />
+      <stop offset="100%" stop-color="#6d4c2c" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+  
+  <!-- Base -->
+  <rect x="50" y="150" width="300" height="100" fill="url(#baseGradient)" stroke="#5A2E0B" rx="10"/>
+  
+  <!-- Vidrio -->
+  <rect x="50" y="50" width="300" height="120" fill="url(#glassGradient)" stroke="#ADD8E6" rx="10"/>
+  
+  <!-- Planta decorativa -->
+  <path d="M180 180 Q190 150, 200 180 T220 180" stroke="#2E8B57" stroke-width="2" fill="transparent" />
+  <path d="M190 175 Q200 145, 210 175 T230 175" stroke="#3CB371" stroke-width="2" fill="transparent" />
+  
+  <!-- Lámpara UV -->
+  <circle id="lamp" cx="200" cy="45" r="15" fill="#444" filter="url(#glow)"/>
+  <rect x="195" y="45" width="10" height="15" fill="#666" />
+  <polygon id="lamp-beam" points="170,50 230,50 210,150 190,150" fill="yellow" opacity="0.3"/>
+  
+  <!-- Humidificador Mejorado -->
+  <g id="humidifier-group">
+    <rect id="humidifier" x="120" y="180" width="30" height="50" fill="#17a2b8" rx="5" filter="url(#glow)"/>
+    <rect x="125" y="185" width="20" height="5" fill="#0f6674" rx="2"/>
+    <rect x="125" y="195" width="20" height="5" fill="#0f6674" rx="2"/>
+    <rect x="125" y="205" width="20" height="5" fill="#0f6674" rx="2"/>
+    
+    <!-- Nubes de vapor mejoradas -->
+    <circle id="smoke-1" cx="135" cy="175" r="5" fill="white" opacity="0"/>
+    <circle id="smoke-2" cx="130" cy="170" r="7" fill="white" opacity="0"/>
+    <circle id="smoke-3" cx="140" cy="165" r="6" fill="white" opacity="0"/>
+    <circle id="smoke-4" cx="125" cy="160" r="8" fill="white" opacity="0"/>
+    <circle id="smoke-5" cx="145" cy="155" r="7" fill="white" opacity="0"/>
+  </g>
+  
+  <!-- Sensor -->
+  <g id="sensor-group">
+    <rect id="sensor" x="300" y="190" width="20" height="30" fill="#28a745" rx="3" filter="url(#glow)"/>
+    <circle cx="310" cy="200" r="3" fill="#fff"/>
+    <circle cx="310" cy="210" r="3" fill="#fff"/>
+    <text id="sensor-temp" x="310" y="230" fill="white" font-size="12" text-anchor="middle">--°C</text>
+    <text id="sensor-hum" x="310" y="245" fill="white" font-size="12" text-anchor="middle">--%</text>
+  </g>
+</svg>
+          </div>
+        </div>
+        
+        <div class="controls mt-4 text-center">
+          <button class="btn btn-lamp me-3" id="toggle-lamp"><i class="bi bi-lightbulb"></i> Luz UV</button>
+          <button class="btn btn-hum" id="toggle-hum"><i class="bi bi-droplet"></i> Humidificador</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="footer mt-5 py-4 bg-green">
+  <div class="container text-center">
+    <p class="mb-0">Sistema Terrario IoT © 2025 - Monitoreo y control de terrarios inteligentes</p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/api.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/control.js"></script>
+</body>
+</html>

@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Historial Completo - Terrario IoT</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&family=Montserrat:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+  <link href="css/style.css" rel="stylesheet">
+  <link rel="icon" href="img/terrario.png" type="image/png">
+</head>
+<body>
+<!--   <nav class="navbar navbar-expand-lg navbar-dark bg-green">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">
+        <i class="bi bi-tree-fill me-2"></i>Terrario IoT
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="index.html">Inicio</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="crud.html">Administración</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="control.html">Control</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="monitor.html">Monitoreo</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="historial.html">Historial Completo</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+ -->
+  <main class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1 class="title-text">📊 Historial Completo</h1>
+      <a href="index.html" class="btn btn-terrario-outline">
+        <i class="bi bi-arrow-left"></i> Volver a Terrarios
+      </a>
+    </div>
+
+    <div class="row mb-4">
+      <div class="col-md-6">
+        <div class="card terrario-card">
+          <div class="card-header bg-transparent">
+            <h5 class="mb-0">🦎 Seleccionar Terrario</h5>
+          </div>
+          <div class="card-body">
+            <select class="form-select" id="selectTerrarioHistorial">
+              <option value="">Cargando terrarios...</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card terrario-card">
+          <div class="card-header bg-transparent">
+            <h5 class="mb-0">📅 Rango de Fechas</h5>
+          </div>
+          <div class="card-body">
+            <div class="row g-2">
+              <div class="col-md-6">
+                <input type="date" class="form-control" id="fechaInicio">
+              </div>
+              <div class="col-md-6">
+                <input type="date" class="form-control" id="fechaFin">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+<div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+  <div>
+    <h5 class="mb-0" id="tituloHistorial">Historial de Datos</h5>
+  </div>
+  <div class="d-flex align-items-center">
+    <span class="badge bg-success update-badge me-2" id="historyUpdateBadge">
+      <i class="bi bi-arrow-repeat"></i> Actualizando cada 2s
+    </span>
+    <div class="btn-group">
+      <button class="btn btn-outline-success btn-sm" id="btnExportarCSV">
+        <i class="bi bi-file-earmark-spreadsheet"></i> CSV
+      </button>
+      <button class="btn btn-outline-success btn-sm" id="btnExportarJSON">
+        <i class="bi bi-code-slash"></i> JSON
+      </button>
+    </div>
+  </div>
+</div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-hover" id="tablaHistorial">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Temperatura (°C)</th>
+                <th>Humedad (%)</th>
+                <th>Lámpara</th>
+                <th>Humidificador</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td colspan="5" class="text-center">Selecciona un terrario para ver su historial</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mt-4">
+      <div class="col-md-6">
+        <div class="card terrario-card">
+          <div class="card-header bg-transparent">
+            <h5 class="mb-0">📈 Estadísticas</h5>
+          </div>
+          <div class="card-body" id="estadisticasContainer">
+            <p class="text-muted">Selecciona un terrario para ver estadísticas</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card terrario-card">
+          <div class="card-header bg-transparent">
+            <h5 class="mb-0">🔍 Resumen de Actividad</h5>
+          </div>
+          <div class="card-body" id="resumenContainer">
+            <p class="text-muted">Selecciona un terrario para ver el resumen</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer mt-5 py-4 bg-green">
+    <div class="container text-center">
+      <p class="mb-0">Sistema Terrario IoT Johanna© 2025 - Monitoreo y control de terrarios inteligentes</p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/historial.js"></script>
+</body>
+</html>

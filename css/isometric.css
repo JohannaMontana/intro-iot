@@ -1,0 +1,104 @@
+/* css/isometric.css */
+:root {
+  --hum-color: #17a2b8;
+  --lamp-color: #ffc107;
+  --sensor-color: #28a745;
+}
+
+.terrario-container {
+  perspective: 1000px;
+  margin: 0 auto;
+}
+
+.terrario {
+  transform-style: preserve-3d;
+  transition: transform 0.5s ease;
+}
+
+.btn-lamp {
+  background-color: var(--lamp-color);
+  color: black;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-lamp:hover {
+  background-color: #e0a800;
+  transform: translateY(-2px);
+}
+
+.btn-hum {
+  background-color: var(--hum-color);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-hum:hover {
+  background-color: #138496;
+  transform: translateY(-2px);
+}
+
+#terrario-svg {
+  border-radius: 12px;
+  background: linear-gradient(to bottom, #e6f3e9, #dfeef1);
+  padding: 10px;
+}
+
+/* Animaciones para el humidificador */
+@keyframes smokeAnimation {
+  0% { opacity: 0; transform: translateY(0) scale(1); }
+  20% { opacity: 0.8; }
+  100% { opacity: 0; transform: translateY(-30px) scale(1.5); }
+}
+
+.smoke-animation {
+  animation: smokeAnimation 3s ease-in-out infinite;
+}
+
+#smoke-1 { animation-delay: 0s; }
+#smoke-2 { animation-delay: 0.5s; }
+#smoke-3 { animation-delay: 1s; }
+#smoke-4 { animation-delay: 1.5s; }
+#smoke-5 { animation-delay: 2s; }
+
+/* Animación para la lámpara */
+.lamp-on {
+  fill: var(--lamp-color) !important;
+  filter: url(#glow);
+}
+
+.lamp-beam-on {
+  opacity: 0.3 !important;
+}
+
+.humidifier-on {
+  fill: var(--hum-color) !important;
+  filter: url(#glow);
+}
+
+/* SVG completo para el terrario */
+#terrario-svg {
+  width: 100%;
+  height: 400px;
+}
+
+#lamp-beam {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.lamp-beam-on {
+  opacity: 0.3 !important;
+}
+
+.smoke-animation {
+  animation: smokeAnimation 3s ease-in-out infinite;
+  opacity: 0;
+}

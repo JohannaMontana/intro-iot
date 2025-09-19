@@ -1,0 +1,179 @@
+/* css/style.css - Estilos adicionales para tarjetas de terrarios */
+.terrario-card {
+  transition: all 0.3s ease;
+  overflow: hidden;
+  position: relative;
+  border: none;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+}
+
+.terrario-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #2E8B57, #8FBC8F);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+
+.terrario-card:hover::before {
+  transform: scaleX(1);
+}
+
+.terrario-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(46, 139, 87, 0.15);
+}
+
+.status-badge {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  z-index: 1;
+  font-size: 0.7rem;
+  padding: 5px 10px;
+  border-radius: 20px;
+}
+
+.device-status {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+
+.device-icon {
+  font-size: 1.2rem;
+  margin-right: 5px;
+}
+
+.progress {
+  height: 8px;
+  margin-bottom: 5px;
+  border-radius: 4px;
+  overflow: hidden;
+  background-color: #e9ecef;
+}
+
+.progress-bar {
+  border-radius: 4px;
+}
+
+.terrario-actions {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.terrario-card:hover .terrario-actions {
+  opacity: 1;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.pulse-animation {
+  animation: pulse 2s infinite;
+}
+
+.card-title {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  color: #2E8B57;
+  margin-bottom: 0.5rem;
+}
+
+.card-footer {
+  border-top: 1px solid rgba(46, 139, 87, 0.1);
+  background: rgba(46, 139, 87, 0.03);
+}
+
+/* Indicador de actualización */
+#refresh-indicator {
+  transition: color 0.5s ease;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.refreshing {
+  animation: spin 1s linear infinite;
+  color: #2E8B57;
+}
+
+/* Mensajes temporales */
+.alert-position {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1050;
+}
+
+/* Agregar al final de style.css */
+.btn-color-option {
+  width: 30px;
+  height: 40px;
+  border-radius: 8px;
+  padding: 0;
+  margin: 2px;
+}
+
+.avatar-selection .btn {
+  font-size: 1.5rem;
+  padding: 0.5rem;
+}
+
+.current-avatar {
+  font-size: 3rem;
+}
+
+.current-color-preview {
+  transition: background-color 0.3s ease;
+}
+
+.refreshing {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Efectos de actualización para la tabla */
+#tablaHistorial {
+  transition: opacity 0.3s ease;
+}
+
+/* Indicador de actualización */
+.updating {
+  opacity: 0.7;
+}
+
+/* Badge de actualización */
+.update-badge {
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+/* Botón Ver Más */
+#verMasButton {
+  transition: all 0.3s ease;
+}
+
+#verMasButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}

@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Monitoreo — Terrario IoT</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&family=Montserrat:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+  <link href="css/style.css" rel="stylesheet">
+  <link rel="icon" href="img/terrario.png" type="image/png">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<!--   <nav class="navbar navbar-expand-lg navbar-dark bg-green">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">
+        <i class="bi bi-tree-fill me-2"></i>Terrario IoT
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="index.html">Inicio</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="crud.html">Administración</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="control.html">Control</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="monitor.html">Monitoreo</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav> -->
+
+  <div class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1 class="title-text">Monitoreo en Tiempo Real</h1>
+      <p class="text-muted" id="terrario-name">Selecciona un terrario desde la página principal</p>
+      <a href="index.html" class="btn btn-terrario-outline">
+        <i class="bi bi-arrow-left"></i> Volver a Terrarios
+      </a>
+    </div>
+    
+    <div class="row g-3">
+      <div class="col-md-8">
+        <div class="card terrario-card p-3 mb-3">
+          <h6><i class="bi bi-thermometer-half"></i> Temperatura y Humedad</h6>
+          <canvas id="tempChart" height="140"></canvas>
+        </div>
+        <div class="card terrario-card p-3">
+          <h6><i class="bi bi-toggle2-on"></i> Estado de Dispositivos</h6>
+          <canvas id="statusChart" height="120"></canvas>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card terrario-card p-3 mb-3">
+          <h6><i class="bi bi-speedometer2"></i> Temperatura Ideal</h6>
+          <canvas id="gaugeChart" height="200"></canvas>
+        </div>
+        <div class="card terrario-card p-3 mb-3">
+          <h6><i class="bi bi-droplet"></i> Logs - Humidificador</h6>
+          <div id="log-hum" class="small-muted"></div>
+        </div>
+        <div class="card terrario-card p-3 mb-3">
+          <h6><i class="bi bi-lightbulb"></i> Logs - Lámpara</h6>
+          <div id="log-lamp" class="small-muted"></div>
+        </div>
+        <div class="card terrario-card p-3">
+          <h6><i class="bi bi-clipboard-data"></i> Logs - Ambiente</h6>
+          <div id="log-amb" class="small-muted"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer mt-5 py-4 bg-green">
+    <div class="container text-center">
+      <p class="mb-0">Sistema Terrario IoT © 2025 - Monitoreo y control de terrarios inteligentes</p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/monitor.js"></script>
+</body>
+</html>
