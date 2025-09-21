@@ -14,7 +14,8 @@
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, #2E8B57, #8FBC8F);
+  background: linear-gradient(90deg, #ffffff, #8FBC8F);
+/*   background: linear-gradient(90deg, #2E8B57, #8FBC8F); */
   transform: scaleX(0);
   transform-origin: left;
   transition: transform 0.3s ease;

@@ -27,11 +27,42 @@ async function getTerrario(id) {
 
 // Crear un nuevo terrario
 async function postTerrario(body) {
-  return await safeFetch(API_BASE, { 
-    method: 'POST', 
-    headers: {'Content-Type': 'application/json'}, 
-    body: JSON.stringify(body) 
-  });
+  try {
+    // Asegurarnos de que los datos del sensor sean válidos
+    const terrarioData = {
+      ...body,
+      // Forzar datos iniciales del sensor a 0.0 como solicitaste
+      sensorAmbiente: [{
+        temperatura: "0.0",
+        humedad: "0.0", 
+        activo: true,
+        fecha: new Date().toISOString()
+      }],
+      // Datos iniciales de dispositivos
+      lamparaUV: [{
+        encendido: false,
+        ultimaEncendido: null,
+        ultimaApagado: new Date().toISOString(),
+        fecha: new Date().toISOString()
+      }],
+      humidificador: [{
+        encendido: false,
+        ultimaEncendido: null,
+        ultimaApagado: new Date().toISOString(),
+        fecha: new Date().toISOString()
+      }],
+      fecha: new Date().toISOString()
+    };
+    
+    return await safeFetch(API_BASE, { 
+      method: 'POST', 
+      headers: {'Content-Type': 'application/json'}, 
+      body: JSON.stringify(terrarioData) 
+    });
+  } catch (error) {
+    console.error('Error en postTerrario:', error);
+    throw error;
+  }
 }
 
 // Actualizar un terrario completo

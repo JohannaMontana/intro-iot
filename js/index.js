@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               <span class="display-6 me-2">${cardAvatar}</span>
               <h5 class="card-title mb-0">${terrario.nombre}</h5>
             </div>
-            ${terrario.especie ? `<p class="text-muted small">Especie: ${terrario.especie}</p>` : '<p class="text-muted small">ID: ' + terrario.id + '</p>'}
+           ${terrario.especie && terrario.especie !== 'otro' ? `<p class="text-muted small">Especie: ${getEspecieDisplayName(terrario.especie)}</p>` : ''}
             
             <div class="device-status">
               <div>
@@ -150,6 +150,22 @@ document.addEventListener('DOMContentLoaded', async () => {
       
       terrariosContainer.appendChild(card);
     });
+
+    // Función para obtener el nombre display de la especie
+function getEspecieDisplayName(especieValue) {
+  if (!especieValue) return '';
+  
+  const especies = {
+    'gecko': 'Gecko Leopardo',
+    'serpiente': 'Serpiente',
+    'tortuga': 'Tortuga', 
+    'iguana': 'Iguana',
+    'camaleon': 'Camaleón',
+    'otro': 'Otra especie'
+  };
+  
+  return especies[especieValue] || especieValue;
+}
     
     // Agregar event listeners para botones de editar
     document.querySelectorAll('.btn-edit-terrario').forEach(btn => {
@@ -213,53 +229,42 @@ async function openEditModal(terrarioId) {
 }
   
   // Guardar nuevo terrario
-  saveTerrarioBtn.addEventListener('click', async () => {
-    const nombre = terrarioNombreInput.value.trim();
-    const avatar = document.querySelector('input[name="terrarioAvatar"]:checked').value;
-    const color = document.querySelector('input[name="terrarioColor"]:checked').value;
-    const especie = document.getElementById('terrarioEspecie').value;
+  // En la función de guardar nuevo terrario, modificar:
+saveTerrarioBtn.addEventListener('click', async () => {
+  const nombre = terrarioNombreInput.value.trim();
+  const avatar = document.querySelector('input[name="terrarioAvatar"]:checked').value;
+  const color = document.querySelector('input[name="terrarioColor"]:checked').value;
+  const especie = document.getElementById('terrarioEspecie').value;
+  
+  if (!nombre) {
+    alert('Por favor ingresa un nombre para el terrario');
+    return;
+  }
+  
+  try {
+    const nuevoTerrario = {
+      nombre,
+      avatar,
+      color,
+      especie,
+      estado: false,
+      // NO incluir sensorAmbiente aquí, dejar que postTerrario lo maneje
+      fecha: new Date().toISOString()
+    };
     
-    if (!nombre) {
-      alert('Por favor ingresa un nombre para el terrario');
-      return;
-    }
+    await postTerrario(nuevoTerrario);
     
-    try {
-      const nuevoTerrario = {
-        nombre,
-        avatar,
-        color,
-        especie,
-        estado: false,
-        sensorAmbiente: [generateSensorData()],
-        lamparaUV: [{
-          encendido: false,
-          ultimaEncendido: null,
-          ultimaApagado: new Date().toISOString(),
-          fecha: new Date().toISOString()
-        }],
-        humidificador: [{
-          encendido: false,
-          ultimaEncendido: null,
-          ultimaApagado: new Date().toISOString(),
-          fecha: new Date().toISOString()
-        }],
-        fecha: new Date().toISOString()
-      };
-      
-      await postTerrario(nuevoTerrario);
-      
-      // Cerrar modal y recargar lista
-      const modal = bootstrap.Modal.getInstance(document.getElementById('addTerrarioModal'));
-      modal.hide();
-      terrarioNombreInput.value = '';
-      
-      await loadTerrarios();
-    } catch (error) {
-      console.error('Error al crear terrario:', error);
-      alert('Error al crear el terrario');
-    }
-  });
+    // Cerrar modal y recargar lista
+    const modal = bootstrap.Modal.getInstance(document.getElementById('addTerrarioModal'));
+    modal.hide();
+    terrarioNombreInput.value = '';
+    
+    await loadTerrarios();
+  } catch (error) {
+    console.error('Error al crear terrario:', error);
+    alert('Error al crear el terrario');
+  }
+});
   
   // Guardar edición de terrario
  // Guardar edición de terrario

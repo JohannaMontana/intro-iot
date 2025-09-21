@@ -313,55 +313,31 @@ async function addManualReading() {
   }
 }
 
-// Simulación automática de sensor cada minuto
+// Simulación automática de sensor cada hora (3600000 ms)
 function startSensorSimulation() {
   setInterval(async () => {
     if (!currentTerrarioId || !currentState.sensor) return;
     
     try {
-      let currentTemp = parseFloat(currentState.sensor.temperatura);
-      let currentHum = parseFloat(currentState.sensor.humedad);
+      // Generar datos realistas con efectos de dispositivos
+      const newData = safeGenerateSensorData(
+        currentState.sensor, 
+        currentState.lamp.encendido, 
+        currentState.humidifier.encendido
+      );
       
-      if (isNaN(currentTemp)) currentTemp = 20;
-      if (isNaN(currentHum)) currentHum = 50;
-      
-      // Pequeña variación aleatoria (±0.5°C y ±2%)
-      const tempVariation = (Math.random() - 0.5) * 1.0;
-      const humVariation = (Math.random() - 0.5) * 4.0;
-      
-      let newTemp = currentTemp + tempVariation;
-      let newHum = currentHum + humVariation;
-      
-      // Ajustar por dispositivos encendidos
-      if (currentState.lamp.encendido) {
-        newTemp += 0.3; // Efecto adicional de lámpara
-      }
-      
-      if (currentState.humidifier.encendido) {
-        newHum += 1.5; // Efecto adicional de humidificador
-      }
-      
-      // Mantener dentro de rangos razonables
-      newTemp = Math.max(15, Math.min(40, newTemp));
-      newHum = Math.max(20, Math.min(90, newHum));
-      
-      await addSensorData(currentTerrarioId, {
-        temperatura: newTemp.toFixed(1),
-        humedad: newHum.toFixed(1),
-        activo: true
-      });
+      await addSensorData(currentTerrarioId, newData);
       
       // Actualizar estado local
-      currentState.sensor.temperatura = newTemp.toFixed(1);
-      currentState.sensor.humedad = newHum.toFixed(1);
+      currentState.sensor = newData;
       
       updateUI(currentState.humidifier, currentState.lamp, currentState.sensor);
-      checkStandards(newTemp, newHum);
+      checkStandards(parseFloat(newData.temperatura), parseFloat(newData.humedad));
       
     } catch (error) {
       console.error('Error en simulación automática:', error);
     }
-  }, 60000); // Cada 60 segundos
+  }, 3600000); // Cada 1 hora (3600000 ms)
 }
 
 // Event listeners para botones
