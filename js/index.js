@@ -362,10 +362,25 @@ editTerrarioForm.addEventListener('submit', async (e) => {
       } catch (error) {
         console.error('Error en actualización automática:', error);
       }
-    }, 2000); // Actualizar cada 2 segundos
+    }, 1800000); // Actualizar cada 2 segundos
   }
 
   // Cargar terrarios al iniciar y comenzar actualización automática
   await loadTerrarios();
   await updateTerrariosPeriodically();
+
+
+  // En index.js, después de await loadTerrarios();
+await loadTerrarios();
+
+// Escuchar eventos de actualización de simulación
+window.addEventListener('terrariosUpdated', async () => {
+  console.log('📢 Recibida actualización de simulación, actualizando vista...');
+  await loadTerrarios();
+});
+
+// Actualizar automáticamente cada 30 segundos por si fallan los eventos
+setInterval(async () => {
+  await loadTerrarios();
+}, 30000);
 });

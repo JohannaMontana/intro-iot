@@ -196,3 +196,23 @@ function generateSensorData() {
     fecha: new Date().toISOString()
   };
 }
+
+// api.js - Agregar función para simulación automática del servidor
+async function simulateTerrarioData(terrarioId) {
+  try {
+    const terrario = await getTerrario(terrarioId);
+    const latestSensor = getLatestDeviceData(terrario, 'sensorAmbiente');
+    
+    const newData = safeGenerateSensorData(
+      latestSensor,
+      getLatestDeviceData(terrario, 'lamparaUV')?.encendido || false,
+      getLatestDeviceData(terrario, 'humidificador')?.encendido || false
+    );
+    
+    await addSensorData(terrarioId, newData);
+    return newData;
+  } catch (error) {
+    console.error('Error en simulación del servidor:', error);
+    throw error;
+  }
+}

@@ -316,7 +316,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     createChartsIfNeeded();
     await refreshMonitor();
     if (poll) clearInterval(poll);
-    poll = setInterval(refreshMonitor, 2000);
+    poll = setInterval(refreshMonitor, 1800000);
   } catch (error) {
     console.error('Error al cargar terrario:', error);
   }

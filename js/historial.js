@@ -1,4 +1,4 @@
-// js/historial.js - Historial completo de terrarios (Mejorado)
+// js/historial.js - Historial completo de terrarios (Corregido y con exportación)
 document.addEventListener('DOMContentLoaded', async () => {
   const selectTerrario = document.getElementById('selectTerrarioHistorial');
   const tablaHistorial = document.getElementById('tablaHistorial');
@@ -7,6 +7,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   const tituloHistorial = document.getElementById('tituloHistorial');
   const fechaInicio = document.getElementById('fechaInicio');
   const fechaFin = document.getElementById('fechaFin');
+  const btnExportarCSV = document.getElementById('btnExportarCSV');
+  const btnExportarJSON = document.getElementById('btnExportarJSON');
 
   let currentTerrarioId = null;
   let refreshInterval = null;
@@ -35,10 +37,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         selectTerrario.appendChild(option);
       });
 
-      // Si hay un terrario en la URL, cargarlo automáticamente y bloquear selector
       if (currentTerrarioId) {
         selectTerrario.value = currentTerrarioId;
-        selectTerrario.disabled = true; // Bloquear selector
+        selectTerrario.disabled = true;
         await cargarHistorial(currentTerrarioId);
       }
     } catch (error) {
@@ -49,7 +50,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Agregar botón para ver más/menos
   function agregarBotonVerMas() {
-    // Eliminar botón anterior si existe
     const existingButton = document.getElementById('verMasButton');
     if (existingButton) {
       existingButton.remove();
@@ -65,7 +65,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       
       button.addEventListener('click', () => {
         mostrandoCompleto = !mostrandoCompleto;
-        mostrarDatosEnTabla(mostrandoCompleto ? todosLosDatos : todosLosDatos.slice(0, 10));
+        const datosParaMostrar = mostrandoCompleto 
+          ? todosLosDatos 
+          : todosLosDatos.slice(0, 10);
+        mostrarDatosEnTabla(datosParaMostrar);
         agregarBotonVerMas();
       });
       
@@ -78,14 +81,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
       const terrario = await getTerrario(terrarioId);
       currentTerrarioId = terrarioId;
-      mostrandoCompleto = false;
       
       // Actualizar título
       tituloHistorial.textContent = `Historial: ${terrario.nombre}`;
       
-      // Procesar datos para la tabla
       todosLosDatos = [];
-      
+
       // Datos de sensor
       if (terrario.sensorAmbiente && terrario.sensorAmbiente.length > 0) {
         terrario.sensorAmbiente.forEach(sensor => {
@@ -131,22 +132,15 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Ordenar por fecha (más reciente primero)
       todosLosDatos.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
       
-      // Mostrar solo los 10 más recientes inicialmente
-      const datosParaMostrar = todosLosDatos.length > 10 ? todosLosDatos.slice(0, 10) : todosLosDatos;
+      // Mostrar según el estado de "Ver más"
+      const datosParaMostrar = mostrandoCompleto 
+        ? todosLosDatos 
+        : (todosLosDatos.length > 10 ? todosLosDatos.slice(0, 10) : todosLosDatos);
       
-      // Mostrar en tabla
       mostrarDatosEnTabla(datosParaMostrar);
-      
-      // Agregar botón "Ver más" si hay más de 10 registros
       agregarBotonVerMas();
-      
-      // Mostrar estadísticas
       mostrarEstadisticas(terrario);
-      
-      // Mostrar resumen
       mostrarResumen(terrario);
-
-      // Iniciar actualización automática
       iniciarActualizacionAutomatica();
       
     } catch (error) {
@@ -158,16 +152,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Iniciar actualización automática
   function iniciarActualizacionAutomatica() {
-    // Limpiar intervalo anterior
     if (refreshInterval) {
       clearInterval(refreshInterval);
     }
 
-    // Crear nuevo intervalo
     refreshInterval = setInterval(async () => {
       if (currentTerrarioId) {
         try {
-          // Efecto visual de actualización
           const tabla = document.querySelector('#tablaHistorial');
           const badge = document.getElementById('historyUpdateBadge');
           
@@ -175,10 +166,8 @@ document.addEventListener('DOMContentLoaded', async () => {
           badge.classList.remove('bg-success');
           badge.classList.add('bg-primary');
           
-          // Recargar datos
           await cargarHistorial(currentTerrarioId);
           
-          // Restaurar apariencia
           setTimeout(() => {
             tabla.classList.remove('updating');
             badge.classList.remove('bg-primary');
@@ -188,10 +177,10 @@ document.addEventListener('DOMContentLoaded', async () => {
           console.error('Error en actualización automática:', error);
         }
       }
-    }, 2000); // Actualizar cada 2 segundos
+    }, 2000);
   }
 
-  // Mostrar datos en tabla con badges de Bootstrap
+  // Mostrar datos en tabla
   function mostrarDatosEnTabla(datos) {
     const tbody = tablaHistorial.querySelector('tbody');
     tbody.innerHTML = '';
@@ -285,7 +274,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     `;
   }
 
-  // Mostrar resumen de actividad
+  // Mostrar resumen
   function mostrarResumen(terrario) {
     let lampOnCount = 0;
     let humidifierOnCount = 0;
@@ -337,10 +326,42 @@ document.addEventListener('DOMContentLoaded', async () => {
     `;
   }
 
+  // === Exportar CSV ===
+  function exportarCSV() {
+    if (todosLosDatos.length === 0) return;
+
+    const encabezados = ["Fecha", "Temperatura", "Humedad", "Lámpara", "Humidificador"];
+    const filas = todosLosDatos.map(d => [
+      formatDateSafe(d.fecha),
+      d.temperatura || "─",
+      d.humedad || "─",
+      d.lamp !== null ? (d.lamp ? "ENCENDIDO" : "APAGADO") : "─",
+      d.humidifier !== null ? (d.humidifier ? "ENCENDIDO" : "APAGADO") : "─"
+    ]);
+
+    const csvContent = [encabezados, ...filas].map(e => e.join(",")).join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `historial_${currentTerrarioId}.csv`;
+    link.click();
+  }
+
+  // === Exportar JSON ===
+  function exportarJSON() {
+    if (todosLosDatos.length === 0) return;
+
+    const blob = new Blob([JSON.stringify(todosLosDatos, null, 2)], { type: "application/json" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `historial_${currentTerrarioId}.json`;
+    link.click();
+  }
+
   // Event listeners
   selectTerrario.addEventListener('change', (e) => {
     if (e.target.value) {
-      // Actualizar URL con el nuevo terrario
       const url = new URL(window.location);
       url.searchParams.set('terrario', e.target.value);
       window.history.replaceState({}, '', url);
@@ -350,10 +371,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  // Obtener terrario de la URL
+  btnExportarCSV.addEventListener('click', exportarCSV);
+  btnExportarJSON.addEventListener('click', exportarJSON);
+
   currentTerrarioId = getTerrarioIdFromURL();
 
-  // Inicializar fechas con rango por defecto (últimos 7 días)
   const today = new Date();
   const sevenDaysAgo = new Date();
   sevenDaysAgo.setDate(today.getDate() - 7);
@@ -361,6 +383,5 @@ document.addEventListener('DOMContentLoaded', async () => {
   fechaInicio.value = sevenDaysAgo.toISOString().split('T')[0];
   fechaFin.value = today.toISOString().split('T')[0];
 
-  // Cargar terrarios al iniciar
   await cargarTerrarios();
 });

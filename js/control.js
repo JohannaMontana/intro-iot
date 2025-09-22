@@ -337,7 +337,7 @@ function startSensorSimulation() {
     } catch (error) {
       console.error('Error en simulación automática:', error);
     }
-  }, 3600000); // Cada 1 hora (3600000 ms)
+  }, 1800000); // 1800000
 }
 
 // Event listeners para botones
@@ -370,7 +370,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     await fetchStatus();
     
     // Actualizar cada 2 segundos
-    setInterval(fetchStatus, 2000);
+    setInterval(fetchStatus, 1800000); //2000
     
     // Iniciar simulación automática de sensor
     startSensorSimulation();

@@ -217,3 +217,56 @@ function safeGenerateSensorData(previousData = null, lampOn = false, humidifierO
     };
   }
 }
+
+// Simulación automática para todos los terrarios (EJECUCIÓN AUTOMÁTICA)
+function startGlobalSimulation() {
+  console.log('🌍 Iniciando simulación global automática');
+  
+  // Función que se ejecutará cada hora
+  async function simulateAllTerrarios() {
+    try {
+      console.log('🔄 Simulando datos para todos los terrarios...');
+      const terrarios = await getAllTerrarios();
+      
+      for (const terrario of terrarios) {
+        try {
+          // Obtener datos actuales del terrario
+          const terrarioActual = await getTerrario(terrario.id);
+          const latestSensor = getLatestDeviceData(terrarioActual, 'sensorAmbiente');
+          const latestLamp = getLatestDeviceData(terrarioActual, 'lamparaUV');
+          const latestHumidifier = getLatestDeviceData(terrarioActual, 'humidificador');
+          
+          // Generar nuevos datos solo si hay datos previos
+          if (latestSensor) {
+            const newData = generateSensorDataWithEffects(
+              latestSensor,
+              latestLamp ? latestLamp.encendido : false,
+              latestHumidifier ? latestHumidifier.encendido : false
+            );
+            
+            // Guardar nuevos datos
+            await addSensorData(terrario.id, newData);
+            console.log(`✅ ${terrario.nombre}: ${newData.temperatura}°C, ${newData.humedad}%`);
+          }
+        } catch (error) {
+          console.error(`❌ Error con terrario ${terrario.id}:`, error);
+        }
+      }
+      
+      console.log('🎉 Simulación completada para todos los terrarios');
+      
+      // Disparar evento personalizado para notificar a las páginas
+      window.dispatchEvent(new CustomEvent('terrariosUpdated'));
+      
+    } catch (error) {
+      console.error('Error en simulación global:', error);
+    }
+  }
+  
+  // Ejecutar inmediatamente y luego cada hora
+  simulateAllTerrarios();
+  // setInterval(simulateAllTerrarios, 1800000); // 1 hora
+}
+
+// Iniciar automáticamente cuando se carga utils.js
+console.log('🔧 utils.js cargado - Simulación global disponible');
